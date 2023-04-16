@@ -22,7 +22,10 @@ enum CollisionLevel {
 
 //using namespace std;
 
+extern SDL_Window* window;
 extern SDL_Renderer* g_renderer;
+extern SDL_GLContext glContext;
 
 #endif // !__GLOBAL_H__
+
 
