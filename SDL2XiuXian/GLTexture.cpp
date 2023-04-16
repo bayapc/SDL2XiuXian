@@ -36,6 +36,8 @@ GLTexture::GLTexture(const char* file_path)
 	else {
 		type = GL_RGB;
 	}
+	width = bkSurf->w;
+	height = bkSurf->h;
 
 	glTexImage2D	(GL_TEXTURE_2D, 	// target
 			 0, 			// level, 0 = base, no minimap,

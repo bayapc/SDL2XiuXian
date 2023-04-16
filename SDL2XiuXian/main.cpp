@@ -33,7 +33,7 @@ int actor_status = 0;
 
 void ProcessInput(SDL_Event* keyEvent);
 
-int main(int argc, char* argv[])
+int sys_init(void)
 {
 	std::cout << "SDL2 Weather System init!" << std::endl;
 	if (SDL_Init(SDL_VIDEO_OPENGL | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0) {
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 	glContext = SDL_GL_CreateContext(window);
 	SDL_GL_MakeCurrent(window, glContext);
 
-	GameWorld* gGame= GameWorld::Get_Instance();
+	GameWorld* gGame = GameWorld::Get_Instance();
 	gGame->Set_Renderer(g_renderer);
 
 	SDL_RendererInfo rendererInfo;
@@ -83,15 +83,11 @@ int main(int argc, char* argv[])
 	//Make a target texture to render too
 	//SDL_Texture *texTarget = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, GAME_WIDTH, GAME_HEIGHT);
 
-	// configure global opengl state
-	SDL_GLContext glContext= SDL_GL_CreateContext(window);
-	SDL_GL_MakeCurrent(window, glContext);
-
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetSwapInterval(1);
 
-    // Create a double-buffered draw context
+	// Create a double-buffered draw context
 	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//SDL_GL_SetSwapInterval(1);
 	glViewport(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -103,14 +99,14 @@ int main(int argc, char* argv[])
 
 	// Set projection MATRIX to ORTHO
 	// I use a near plane value of -1, and a far plane value of 1, which is what works best for 2D games.
-    //glOrtho(0.0, GAME_WIDTH, 0.0, GAME_HEIGHT, -1.0, 1.0);
+	//glOrtho(0.0, GAME_WIDTH, 0.0, GAME_HEIGHT, -1.0, 1.0);
 
 	// Setting Mode to GL_MODELVIEW
 	//glMatrixMode(GL_MODELVIEW);
 
 	// -----------------------------
 	//glEnable(GL_DEPTH_TEST);
-  
+
 	// ----- ICO
 	IMG_Init(IMG_INIT_PNG);
 	SDL_Surface* loadedSurface = IMG_Load("res/images/xiuxian.png");
@@ -120,12 +116,22 @@ int main(int argc, char* argv[])
 	SDL_SetWindowIcon(window, loadedSurface);
 	SDL_FreeSurface(loadedSurface);
 
+	return 0;
+}
+
+int main(int argc, char* argv[])
+{
+	if (sys_init()) {
+		std::cout<<"SDL init error"<<std::endl;
+		return -1;
+	}
+
 	SDL_Event* mainEvent = new SDL_Event();
 
 	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
 #if true
-#if true
+#if false
 #if false
 	// ----- actor
 	//Put your own bmp image here
@@ -184,7 +190,7 @@ int main(int argc, char* argv[])
     };
 
 #else
-	background bk;
+	Background bk;
 #endif
 	Player player1;
 	player1.states.push_back(new ActorState("walk right","res/images/amy/wright_0.png",
@@ -222,15 +228,16 @@ int main(int argc, char* argv[])
 	//targetRect.x = 0; targetRect.y = 0; targetRect.w = 64; targetRect.h = 84;
 	//blendingShader.use();
 	//blendingShader.setInt("texture1", 0);
+#if false
 	bkShader->use();
 	bkShader->setInt("texture1", 0);
-
+#endif
 	while(!quitGame) {
 		frameTime = SDL_GetTicks();
 #if true
 
 		SDL_GL_MakeCurrent(window, glContext);
-#if false
+#if true
 		//std::cout << "." << std::endl;
 		srcRect1.x += actor_status;
 		if (srcRect1.x < 0) {
@@ -255,6 +262,7 @@ int main(int argc, char* argv[])
 		glVertex2f(500.0, 500.0);
 		glEnd();
 #else
+#if false
 		bkShader->use();
 		//glm::mat4 model = glm::mat4(1.0f);
         // vegetation
@@ -267,6 +275,15 @@ int main(int argc, char* argv[])
         //    bkShader->setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         //}
+#else
+		bk.bkShader->use();
+		//glm::mat4 model = glm::mat4(1.0f);
+        // vegetation
+        glBindVertexArray(bk.planeVAO);
+        glBindTexture(GL_TEXTURE_2D, bk.bkTextures[0]->get_texture());
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+#endif
 
 #endif
 #endif
@@ -302,8 +319,15 @@ int main(int argc, char* argv[])
 				player1.set_current_state("walk left");
 			}
 		}
-		//player1.update();
-		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
+		player1.update();
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect2);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect4);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect5);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect6);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
+		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect8);
 #endif
 
 		//SDL_RenderPresent(g_renderer);
