@@ -226,66 +226,14 @@ int main(int argc, char* argv[])
 	targetRect7.x = 50; targetRect7.y = 500; targetRect7.w = 112; targetRect7.h = 168;
 	targetRect8.x = 100; targetRect8.y = 420; targetRect8.w = 460; targetRect8.h = 240;
 	//targetRect.x = 0; targetRect.y = 0; targetRect.w = 64; targetRect.h = 84;
-	//blendingShader.use();
-	//blendingShader.setInt("texture1", 0);
-#if false
-	bkShader->use();
-	bkShader->setInt("texture1", 0);
-#endif
+
 	while(!quitGame) {
 		frameTime = SDL_GetTicks();
-#if true
-
 		SDL_GL_MakeCurrent(window, glContext);
+
 #if true
-		//std::cout << "." << std::endl;
-		srcRect1.x += actor_status;
-		if (srcRect1.x < 0) {
-			srcRect1.x = 0;
-		}
-		if (srcRect1.x +srcRect1.w > BACKGROUND_WIDTH ) {
-			srcRect1.x = BACKGROUND_WIDTH - srcRect1.w;
-		}
-		bk.update(glm::vec2(srcRect1.x,srcRect1.y));
+		bk.update(glm::vec2(actor_status, 0));
 		bk.render();
-#else
-
-		glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-#if false
-		glColor4ub(255, 0, 0, 255);
-		glBegin(GL_LINE_LOOP);
-		glVertex2f(1000.0, 500.0);
-		glVertex2f(1000.0, 200.0);
-		glVertex2f(500.0, 200.0);
-		glVertex2f(500.0, 500.0);
-		glEnd();
-#else
-#if false
-		bkShader->use();
-		//glm::mat4 model = glm::mat4(1.0f);
-        // vegetation
-        glBindVertexArray(transparentVAO);
-        glBindTexture(GL_TEXTURE_2D, bkTexture->get_texture());
-        //for (unsigned int i = 0; i < vegetation.size(); i++)
-        //{
-        //    model = glm::mat4(1.0f);
-        //    model = glm::translate(model, vegetation[i]);
-        //    bkShader->setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-        //}
-#else
-		bk.bkShader->use();
-		//glm::mat4 model = glm::mat4(1.0f);
-        // vegetation
-        glBindVertexArray(bk.planeVAO);
-        glBindTexture(GL_TEXTURE_2D, bk.bkTextures[0]->get_texture());
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-#endif
-
-#endif
 #endif
 
 #if false
@@ -331,7 +279,6 @@ int main(int argc, char* argv[])
 #endif
 
 		//SDL_RenderPresent(g_renderer);
-#endif
 		SDL_GL_SwapWindow(window);
 
 		ProcessInput(mainEvent);
@@ -381,6 +328,7 @@ void ProcessInput(SDL_Event* keyEvent)
 		if (keyEvent->key.keysym.sym == SDLK_ESCAPE) {
 			quitGame = true;
 		}
+		//actor_status = 0;
 	}
 	else if (keyEvent->type == SDL_KEYDOWN) {
 		if (keyEvent->key.keysym.sym == SDLK_d) {

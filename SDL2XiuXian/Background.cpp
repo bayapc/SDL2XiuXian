@@ -8,13 +8,13 @@ Background::Background():
 {
 	planeV = new float[30]{
           // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
-        -1.0f, -1.0f,   0.0f,  0.0f,  1.0f,
-         3.0f, -1.0f,   0.0f,  1.0f,  1.0f,
-         3.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+        -2.0f, -1.0f,   0.0f,  0.0f,  1.0f,
+         6.0f, -1.0f,   0.0f,  1.0f,  1.0f,
+         6.0f,  1.0f,  0.0f,  1.0f,  0.0f,
 
-        -1.0f, -1.0f,    0.0f,  0.0f,  1.0f,
-         3.0f, 1.0f,  0.0f,  1.0f,  0.0f,
-        -1.0f, 1.0f,  0.0f,  0.0f,  0.0f
+        -2.0f, -1.0f,    0.0f,  0.0f,  1.0f,
+         6.0f, 1.0f,  0.0f,  1.0f,  0.0f,
+        -2.0f, 1.0f,  0.0f,  0.0f,  0.0f
 	};
 	// plane VAO
 	glGenVertexArrays(1, &planeVAO);
@@ -42,8 +42,10 @@ Background::Background():
 	vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
 
 	glEnable(GL_TEXTURE_2D);
+
+
 	// camera
-	bkCamera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+	bkCamera = new Camera(glm::vec3(0.0f, 0.0f, 2.4f));
 
 	// build and compile our shader zprogram
 	// ------------------------------------
@@ -55,6 +57,14 @@ Background::Background():
 
 	bkShader->use();
 	bkShader->setInt("texture1", 0);
+
+ // pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
+    // -----------------------------------------------------------------------------------------------------------
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+    bkShader->setMat4("projection", projection); 
+	glm::mat4 model = glm::mat4(1.0f);
+	//model = glm::translate(model, glm::vec3(position));
+	bkShader->setMat4("model", model);
 }
 
 void Background::render(void)
@@ -66,22 +76,21 @@ void Background::render(void)
 	bkShader->use();
 	glBindVertexArray(planeVAO);
 	glBindTexture(GL_TEXTURE_2D, (*(bkTextures.begin()))->get_texture());
-	//background_position.x += (-targetRect.x * 0.01);
-	//glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(position));
-	//bkShader->setMat4("model", model);
-	//bkShader->setFloat("bkOffset", position.x);
+	bkShader->setMat4("view", bkCamera->GetViewMatrix());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Background::update(glm::vec2 pos)
 {
-	position.x += (-pos.x);
-	std::cout << "bkPostion:" << position.x << std::endl;
-	if (position.x < -(bkTextures[0]->get_width() - width)) {
-		position.x = -(bkTextures[0]->get_width() - width);
+	position.x += pos.x;
+	if (position.x < 0) {
+		position.x = 0;
+	}else if (position.x > (bkTextures[0]->get_width())) {
+		position.x = bkTextures[0]->get_width();
+	}else {
+		bkCamera->Position.x = position.x * 0.001;
 	}
-	//glViewport(position.x, 0, position.x + width, height);
+	std::cout << "bkPostion:" << position.x <<" bkTexture width:" <<bkTextures[0]->get_width()<< std::endl;
 	for (unsigned int i = 0; i < vegetation.size(); i++)
 	{
 		vegetation[i].x += pos.x * 0.01;
