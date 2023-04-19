@@ -15,6 +15,7 @@ private:
 	int width;
 	int height;
 	glm::vec3 position;
+	glm::vec3 lightPos;
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	//float* cubeV;

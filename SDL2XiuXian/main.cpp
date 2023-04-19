@@ -198,12 +198,16 @@ int main(int argc, char* argv[])
 																 "res/images/amy/wright_2.png",
 																 "res/images/amy/wright_3.png",
 																COLLISION_LEVEL_NULL));
+	player1.states.push_back(new ActorState("idle right","res/images/amy/wright_0.png",
+																COLLISION_LEVEL_NULL));
 	player1.states.push_back(new ActorState("walk left","res/images/amy/wleft_0.png",
 																 "res/images/amy/wleft_1.png",
 																 "res/images/amy/wleft_2.png",
 																 "res/images/amy/wleft_3.png",
 																COLLISION_LEVEL_NULL));
-	player1.set_current_state("walk right");
+	player1.states.push_back(new ActorState("idle left","res/images/amy/wleft_0.png",
+																COLLISION_LEVEL_NULL));
+	player1.set_current_state("idle right");
 
 	//SDL_RenderCopy(g_renderer, backgroundTex, NULL, NULL);
 #endif
@@ -227,12 +231,15 @@ int main(int argc, char* argv[])
 	targetRect8.x = 100; targetRect8.y = 420; targetRect8.w = 460; targetRect8.h = 240;
 	//targetRect.x = 0; targetRect.y = 0; targetRect.w = 64; targetRect.h = 84;
 
-	while(!quitGame) {
+	while (!quitGame) {
 		frameTime = SDL_GetTicks();
 		SDL_GL_MakeCurrent(window, glContext);
 
 #if true
-		bk.update(glm::vec2(actor_status, 0));
+		if (((actor_status < 0) && (player1.get_position().x < GAME_HEIGHT / 3))||
+			((actor_status > 0) && (player1.get_position().x > GAME_HEIGHT* 2 / 3))){
+			bk.update(glm::vec2(actor_status, 0));
+		}
 		bk.render();
 #endif
 
@@ -266,16 +273,24 @@ int main(int argc, char* argv[])
 			if (player1.get_current_state() != "walk left") {
 				player1.set_current_state("walk left");
 			}
+		}else {
+			if ((player1.get_current_state() == "idle right") || (player1.get_current_state() == "walk right")) {
+				player1.set_current_state("idle right");
+			}
+			else {
+				player1.set_current_state("idle left");
+			}
 		}
 		player1.update();
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect2);
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect4);
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect5);
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect6);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect2);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect4);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect5);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect6);
+		targetRect7.x += actor_status;
 		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
-		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect8);
+		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect8);
 #endif
 
 		//SDL_RenderPresent(g_renderer);
@@ -328,7 +343,7 @@ void ProcessInput(SDL_Event* keyEvent)
 		if (keyEvent->key.keysym.sym == SDLK_ESCAPE) {
 			quitGame = true;
 		}
-		//actor_status = 0;
+		actor_status = 0;
 	}
 	else if (keyEvent->type == SDL_KEYDOWN) {
 		if (keyEvent->key.keysym.sym == SDLK_d) {
@@ -343,13 +358,18 @@ void ProcessInput(SDL_Event* keyEvent)
 		}
 		if (keyEvent->key.keysym.sym == SDLK_w) {
 			//targetRect.x += 1;
-			targetRect1.y -= 30;
-			actor_status += 1;
+			//targetRect7.y -= 30;
+			targetRect7.y = 300;
+			if (actor_status < 0) {
+				actor_status -= 1;
+			}else {
+				actor_status += 1;
+			}
 		}
 		if (keyEvent->key.keysym.sym == SDLK_s) {
 			//targetRect.x = 0;
 			actor_status = 0;
-			targetRect1.y += 40;
+			targetRect7.y = 500;
 		}
 	}
 }

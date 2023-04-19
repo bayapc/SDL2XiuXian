@@ -1,8 +1,8 @@
 #Xiuxian
 
-The game is about God story
+The game is about God story.
 
-"XiuXian"(修仙) is chinese language word, be hard translated. It means a persion evolve from a man in the street to be a God. That's a long long way.
+"XiuXian"(修仙) is chinese language word, be hard translated. It means a person evolve from a man in the street to be a God. That's a long long way.
 
 ##Dependency
 
