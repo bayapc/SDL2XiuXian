@@ -236,8 +236,8 @@ int main(int argc, char* argv[])
 		SDL_GL_MakeCurrent(window, glContext);
 
 #if true
-		if (((actor_status < 0) && (player1.get_position().x < GAME_HEIGHT / 3))||
-			((actor_status > 0) && (player1.get_position().x > GAME_HEIGHT* 2 / 3))){
+		if (((actor_status < 0) && (player1.get_position().x < GAME_WIDTH / 3))||
+			((actor_status > 0) && (player1.get_position().x > GAME_WIDTH / 2))){
 			bk.update(glm::vec2(actor_status, 0));
 		}
 		bk.render();
@@ -265,6 +265,7 @@ int main(int argc, char* argv[])
 		SDL_RenderCopy(g_renderer, amyTex[amyframe_index++/40], NULL, &targetRect7);
 		SDL_RenderCopy(g_renderer, soldierTex[amyframe_index++/40], NULL, &targetRect8);
 #else
+#if false
 		if (actor_status == 1) {
 			if (player1.get_current_state() != "walk right") {
 				player1.set_current_state("walk right");
@@ -281,14 +282,20 @@ int main(int argc, char* argv[])
 				player1.set_current_state("idle left");
 			}
 		}
-		player1.update();
+#endif
+		player1.update(actor_status);
+		glm::vec2 pos = player1.get_position();
+		std::cout << "player Position:(" << pos.x<<"," << pos.y <<")" << std::endl;
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect2);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect4);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect5);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect6);
-		targetRect7.x += actor_status;
+		//targetRect7.x += actor_status;
+		targetRect7.x = pos.x;
+		targetRect7.y = pos.y;
+		//player1.set_position(glm::vec2(targetRect7.x, targetRect7.y));
 		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect8);
 #endif
