@@ -6,6 +6,7 @@
 #include "Actor.h"
 #include "Player.h"
 #include "background.h"
+#include "Lawn.h"
 
 // screen
 int GAME_WIDTH = 1280;
@@ -13,6 +14,8 @@ int GAME_HEIGHT = 720;
 // background
 int BACKGROUND_WIDTH = 1280;
 int BACKGROUND_HEIGHT = 720;
+
+int g_offset_x = 0;
 
 SDL_Window* window;
 SDL_Renderer* g_renderer;
@@ -192,6 +195,12 @@ int main(int argc, char* argv[])
 #else
 	Background bk;
 #endif
+
+	Lawn lawn1;
+	lawn1.states.push_back(new ActorState("spring","res/images/lawn.png",
+																COLLISION_LEVEL_NULL));
+	lawn1.set_current_state("spring");
+
 	Player player1;
 	player1.states.push_back(new ActorState("walk right","res/images/amy/wright_0.png",
 																 "res/images/amy/wright_1.png",
@@ -221,7 +230,7 @@ int main(int argc, char* argv[])
 
 	srcRect1.x = 0; srcRect1.y = 0; srcRect1.w = 853; srcRect1.h = 480;
 
-	targetRect1.x = 600; targetRect1.y = 420; targetRect1.w = 160; targetRect1.h = 240;
+	targetRect1.x = 0; targetRect1.y = 0; targetRect1.w = 100; targetRect1.h = 100;
 	targetRect2.x = 500; targetRect2.y = 420; targetRect2.w = 160; targetRect2.h = 240;
 	targetRect3.x = 750; targetRect3.y = 420; targetRect3.w = 160; targetRect3.h = 240;
 	targetRect4.x = 800; targetRect4.y = 420; targetRect4.w = 160; targetRect4.h = 240;
@@ -241,6 +250,23 @@ int main(int argc, char* argv[])
 			bk.update(glm::vec2(actor_status, 0));
 		}
 		bk.render();
+
+		g_offset_x += (-actor_status)*2;
+		if (g_offset_x > 0) {
+			g_offset_x = -98;
+		}
+		if (g_offset_x < -100) {
+			g_offset_x = -2;
+		}
+		/* draw lawn */
+		for (int i = 0; i <15; i++) {
+			targetRect1.x = i*100 + g_offset_x;
+			if ((targetRect1.x > -100)&&(targetRect1.x < GAME_WIDTH +100)) {
+				targetRect1.y = 630;
+				//player1.set_position(glm::vec2(targetRect7.x, targetRect7.y));
+				SDL_RenderCopy(g_renderer, lawn1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
+			}
+		}
 #endif
 
 #if false

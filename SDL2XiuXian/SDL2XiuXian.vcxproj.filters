@@ -47,6 +47,9 @@
     <ClCompile Include="GameWorld.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Lawn.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -81,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="Global.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Lawn.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
