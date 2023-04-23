@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "background.h"
 #include "Lawn.h"
+#include "PhysicsEngine.h"
 
 // screen
 int GAME_WIDTH = 1280;
@@ -32,6 +33,8 @@ SDL_Rect targetRect5;
 SDL_Rect targetRect6;
 SDL_Rect targetRect7;
 SDL_Rect targetRect8;
+
+//KeyEvent actor_status = KEY_IDLE;
 int actor_status = 0;
 
 void ProcessInput(SDL_Event* keyEvent);
@@ -240,6 +243,9 @@ int main(int argc, char* argv[])
 	targetRect8.x = 100; targetRect8.y = 420; targetRect8.w = 460; targetRect8.h = 240;
 	//targetRect.x = 0; targetRect.y = 0; targetRect.w = 64; targetRect.h = 84;
 
+	PhysicsEngine physicsEngine;
+	physicsEngine.list.push_back(&player1);
+
 	while (!quitGame) {
 		frameTime = SDL_GetTicks();
 		SDL_GL_MakeCurrent(window, glContext);
@@ -310,8 +316,12 @@ int main(int argc, char* argv[])
 		}
 #endif
 		player1.update(actor_status);
+		if (actor_status == 2) {
+			/* Jump one time, reset to idle*/
+			actor_status = 0;
+		}
 		glm::vec2 pos = player1.get_position();
-		std::cout << "player Position:(" << pos.x<<"," << pos.y <<")" << std::endl;
+		//std::cout << "player Position:(" << pos.x<<"," << pos.y <<")" << std::endl;
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect2);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
@@ -320,7 +330,7 @@ int main(int argc, char* argv[])
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect6);
 		//targetRect7.x += actor_status;
 		targetRect7.x = pos.x;
-		targetRect7.y = pos.y;
+		targetRect7.y = GAME_HEIGHT - pos.y; //invert Y axis
 		//player1.set_position(glm::vec2(targetRect7.x, targetRect7.y));
 		SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
 		//SDL_RenderCopy(g_renderer, player1.current_state->get_current_picture()->get_texture(), NULL, &targetRect8);
@@ -376,33 +386,39 @@ void ProcessInput(SDL_Event* keyEvent)
 		if (keyEvent->key.keysym.sym == SDLK_ESCAPE) {
 			quitGame = true;
 		}
+		//actor_status = KEY_IDLE;
 		actor_status = 0;
 	}
 	else if (keyEvent->type == SDL_KEYDOWN) {
 		if (keyEvent->key.keysym.sym == SDLK_d) {
 			///targetRect.x += 1;
 			//targetRect.x = 1;
+			//actor_status = KEY_WALK_RIGHT;
 			actor_status = 1;
 		}
 		if (keyEvent->key.keysym.sym == SDLK_a) {
 			//targetRect.x -= 1;
 			//targetRect.x = -1;
+			//actor_status = KEY_WALK_LEFT;
 			actor_status = -1;
 		}
 		if (keyEvent->key.keysym.sym == SDLK_w) {
+			//actor_status = KEY_JUMP;
+			actor_status = 2;
 			//targetRect.x += 1;
 			//targetRect7.y -= 30;
-			targetRect7.y = 300;
-			if (actor_status < 0) {
-				actor_status -= 1;
-			}else {
-				actor_status += 1;
-			}
+			//targetRect7.y = 200;
+			//if (actor_status < 0) {
+		//		actor_status -= 1;
+		//	}else {
+		//		actor_status += 1;
+		//	}
 		}
 		if (keyEvent->key.keysym.sym == SDLK_s) {
-			//targetRect.x = 0;
+			//actor_status = KEY_RUN;
 			actor_status = 0;
-			targetRect7.y = 500;
+			//targetRect.x = 0;
+			//targetRect7.y = 500;
 		}
 	}
 }

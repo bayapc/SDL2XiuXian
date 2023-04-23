@@ -1,11 +1,12 @@
 #pragma once
 #ifndef __GLOBAL_H__
 #define __GLOABAL_H__
-
+#include <windows.h>
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <string>
+#include <thread>
 #include <sdl.h>
 #include <SDL_image.h>
 #include <glad/glad.h>
@@ -20,6 +21,14 @@ enum CollisionLevel {
 	COLLISION_LEVEL_2,
 	COLLISION_LEVEL_3
 };
+
+typedef enum {
+	KEY_IDLE,
+	KEY_WALK_LEFT,
+	KEY_WALK_RIGHT,
+	KEY_JUMP,
+	KEY_RUN
+}KeyEvent;
 
 //using namespace std;
 

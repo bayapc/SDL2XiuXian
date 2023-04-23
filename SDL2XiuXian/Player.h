@@ -8,7 +8,8 @@ class Player :public Actor
 public:
     Player() :level(0), score(0) 
     {
-        set_position(glm::vec2(50, 500));
+        set_position(glm::vec2(50, 220));
+        set_speed(glm::vec2(0,0));
     };
     ~Player() {};
 
