@@ -151,6 +151,7 @@
     <ClCompile Include="ActorTexture.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="GameWorld.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTexture.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="ActorTexture.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EventManager.h" />
     <ClInclude Include="GameWorld.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="GLTexture.h" />

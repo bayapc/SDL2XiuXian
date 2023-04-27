@@ -3,22 +3,30 @@
 void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 {
 	glm::vec2 speed = a->get_speed();
+	//std::cout << "PhyEngine:speed:(" << speed.x << "," << speed.y << ")" << std::endl;
 	glm::vec2 pos = a->get_position();
 	pos.x = pos.x + speed.x * t;
 	pos.y = pos.y + speed.y * t - 0.5 * 9.8 * t * t;//invert y coordinate
 	a->set_position(pos);
 
-	if (speed.x > 0) {
-		speed.x = speed.x - t;
-	}else {
-		speed.x = 0;
+	if (a->get_acceleration() == 0) {
+		/* from other state to idle,start decrease speed.x */
+		if (speed.x > 0.2) {
+			speed.x = speed.x - t;
+		}
+		else if (speed.x < -0.2) {
+			speed.x = speed.x + t;
+		}
+		else {
+			speed.x = 0;
+		}
 	}
 	speed.y = speed.y - 9.8 * t;
 	a->set_speed(speed);
 	//if (speed.y != 0) {
 		//std::cout << "T:" << t << std::endl;
-		std::cout << "PE:pos:(" << pos.x << "," << pos.y << ")" << std::endl;
-		//std::cout << "PE:pos:(" << pos.x << "," << pos.y << ") speed:(" << speed.x << "," << speed.y << ")" << std::endl;
+		//std::cout << "PhyEngine:pos:(" << pos.x << "," << pos.y << ")" << std::endl;
+		//std::cout << "PhyEngine:pos:(" << pos.x << "," << pos.y << ") speed:(" << speed.x << "," << speed.y << ")" << std::endl;
 	//}
 }
 

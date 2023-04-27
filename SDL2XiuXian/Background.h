@@ -3,13 +3,15 @@
 #include "GLTexture.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "Actor.h"
+#include "EventManager.h"
 
-class Background
+class Background:public Actor
 {
 public:
 	Background();
 	~Background() {}
-	void update(glm::vec2 pos);
+	void update();
 	void render();
 private:
 	int width;

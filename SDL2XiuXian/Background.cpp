@@ -194,20 +194,25 @@ void Background::render(void)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Background::update(glm::vec2 pos)
+void Background::update()
 {
-	position.x += pos.x;
-	if (position.x < 0) {
-		position.x = 0;
-	}else if (position.x > (bkTextures[0]->get_width())) {
-		position.x = bkTextures[0]->get_width();
-	}else {
-		bkCamera->Position.x = position.x * 0.001;
-	}
-	//std::cout << "bkPostion:" << position.x <<" bkTexture width:" <<bkTextures[0]->get_width()<< std::endl;
-	for (unsigned int i = 0; i < vegetation.size(); i++)
-	{
-		vegetation[i].x += pos.x * 0.01;
+	ActorEvent ae = EventManager::get_instance()->get_event(this);
+	if (ae.event == KEY_BACKGROUND_MOVE) {
+		position.x += ae.speed.x * 0.1;
+		if (position.x < 0) {
+			position.x = 0;
+		}
+		else if (position.x > (bkTextures[0]->get_width())) {
+			position.x = bkTextures[0]->get_width();
+		}
+		else {
+			bkCamera->Position.x = position.x * 0.001;
+		}
+		//std::cout << "bkPostion:" << position.x <<" bkTexture width:" <<bkTextures[0]->get_width()<< std::endl;
+		for (unsigned int i = 0; i < vegetation.size(); i++)
+		{
+			vegetation[i].x += ae.speed.x * 0.01;
+		}
 	}
 
 }

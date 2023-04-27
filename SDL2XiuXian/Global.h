@@ -7,6 +7,7 @@
 #include <queue>
 #include <string>
 #include <thread>
+#include <map>
 #include <sdl.h>
 #include <SDL_image.h>
 #include <glad/glad.h>
@@ -14,6 +15,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 enum CollisionLevel {
 	COLLISION_LEVEL_NULL,
@@ -24,12 +26,32 @@ enum CollisionLevel {
 
 typedef enum {
 	KEY_IDLE,
+	KEY_STOP,
 	KEY_WALK_LEFT,
 	KEY_WALK_RIGHT,
 	KEY_JUMP,
-	KEY_RUN
+	KEY_RUN_LEFT,
+	KEY_RUN_RIGHT,
+	KEY_RUN_JUMP,
+	KEY_FLY,
+	KEY_ATTACK,
+	KEY_BACKGROUND_MOVE
 }KeyEvent;
 
+typedef struct {
+	Uint32 uid;
+	KeyEvent event;
+	glm::vec2 speed;
+}ActorEvent;
+
+/*
+ * Global Actor Unique ID.
+ * Start from logic one,0 means actor in preview init status.
+*/
+inline Uint32 alloc_actor_uid(void) {
+	static Uint32 actor_uid = 1;
+	return actor_uid++;
+}
 //using namespace std;
 
 extern SDL_Window* window;

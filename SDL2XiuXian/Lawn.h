@@ -1,6 +1,8 @@
 #pragma once
 #include "Global.h"
 #include "Actor.h"
+#include "EventManager.h"
+
 class Lawn :
     public Actor
 {

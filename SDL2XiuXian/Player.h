@@ -2,6 +2,7 @@
 #include "Global.h"
 #include "Actor.h"
 #include "GameWorld.h"
+#include "EventManager.h"
 
 class Player :public Actor
 {
@@ -15,7 +16,7 @@ public:
 
     void set_current_state(std::string name);
     std::string get_current_state(void);
-    void update(int v);
+    void update();
     //backpack;
     //weapon;
     Actor* addon;

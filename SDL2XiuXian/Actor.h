@@ -9,8 +9,10 @@ public:
 	Actor() :
 		position(0,0), speed(0,0), acceleration(0), lifetime(100)
 	{
+		uid = alloc_actor_uid();
 	}
 	~Actor() {}
+	Uint32 get_uid(void)			const   { return uid; }
 	void set_position(glm::vec2 p)			{ position = p; }
 	glm::vec2 get_position()		const	{ return position;}
 	void set_speed(glm::vec2 s)					{ speed = s;}
@@ -33,6 +35,7 @@ private:
     };
     std::deque<Trail> trails;
 
+	Uint32 uid;
 	glm::vec2 position;
 	glm::vec2 speed;
 	int acceleration;
