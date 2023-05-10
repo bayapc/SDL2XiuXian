@@ -48,6 +48,9 @@ void Player::update(void)
 	if (ae.uid != 0) {
 		/* const speed in x axis direction*/
 		set_acceleration(1);
+		if (ae.event == KEY_DESTROY) {
+			std::cout << "Player:Collision Event" << std::endl;
+		}
 
 		if (ae.event == KEY_WALK_RIGHT) {
 			if (get_current_state() != "walk right") {

@@ -7,13 +7,23 @@ class Actor
 {
 public:
 	Actor() :
-		position(0,0), speed(0,0), acceleration(0), lifetime(100)
+		position(0,0), speed(0,0), acceleration(0), lifetime(100),width(100),height(100)
 	{
 		uid = alloc_actor_uid();
 	}
 	~Actor() {}
+
+	ActorState* current_state;
+	int width;
+	int height;
+
 	Uint32 get_uid(void)			const   { return uid; }
-	void set_position(glm::vec2 p)			{ position = p; }
+	void set_position(glm::vec2 p) {
+		position = p;
+		aabb.aa = p;
+		aabb.bb.x = p.x + width;
+		aabb.bb.y = p.y + height;
+	}
 	glm::vec2 get_position()		const	{ return position;}
 	void set_speed(glm::vec2 s)					{ speed = s;}
 	glm::vec2 get_speed(void)		const	{ return speed;}
@@ -23,8 +33,8 @@ public:
 	int get_lifetime(void)			const	{ return lifetime;}
 	void update(void);
 	void scroll_back(void);
+	AABB_BOX get_aabb()				const   { return aabb;}
 
-	ActorState* current_state;
 private:
     struct Trail{
 		Trail(glm::vec2 pos, ActorState* ptr) { position = pos; state_ptr = ptr; }
@@ -40,5 +50,7 @@ private:
 	glm::vec2 speed;
 	int acceleration;
 	int lifetime;
+	MATERIAL material;
+	AABB_BOX aabb;
 };
 

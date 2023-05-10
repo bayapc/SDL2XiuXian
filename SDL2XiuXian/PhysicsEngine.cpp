@@ -30,6 +30,35 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 	//}
 }
 
+static bool is_collision(AABB_BOX first, AABB_BOX second)
+{
+	bool collisionX = (first.bb.x >= second.aa.x) && (first.aa.x <= second.bb.x);
+	bool collisionY = (first.bb.y >= second.aa.y) && (first.aa.y <= second.bb.y);
+
+	return collisionX && collisionY;
+}
+
+void PhysicsEngine::do_collision(Actor* a)
+{
+	EventManager* em = EventManager::get_instance();
+	for (auto i = GameWorld::Get_Instance()->visible_list.begin(); i != GameWorld::Get_Instance()->visible_list.end(); i++) {
+		if (a->get_uid() == (*i)->get_uid()) {
+			continue;
+		}
+		if (is_collision(a->get_aabb(),(*i)->get_aabb())) {
+			ActorEvent e;
+			e.uid = a->get_uid();
+			e.event = KEY_DESTROY;
+			em->dispatch_event(e);
+			if ((*i)->get_lifetime() > 0) {
+				e.uid = (*i)->get_uid();
+				em->dispatch_event(e);
+			}
+			break;
+		}
+	}
+}
+
 void PhysicsEngine::engine_thread(void)
 {
 	Uint32 interval = 0;//ms
@@ -47,6 +76,7 @@ void PhysicsEngine::engine_thread(void)
 			}
 			for (auto i = list.begin(); i != list.end(); i++) {
 				calculate_position(*i,interval*0.01);
+				do_collision(*i);
 			}
 			oldTime = newTime;
 		}

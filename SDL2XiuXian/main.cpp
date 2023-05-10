@@ -18,6 +18,7 @@ int BACKGROUND_WIDTH = 1280;
 int BACKGROUND_HEIGHT = 720;
 
 int g_offset_x = 0;
+bool g_debug_collision = false;
 
 SDL_Window* window;
 SDL_Renderer* g_renderer;
@@ -39,7 +40,7 @@ ActorEvent actor_event = {0, KEY_IDLE,{0,0}};
 /********************Actors***************************/
 EventManager* event_manager;
 Background* bk;
-Lawn* lawn1;
+Lawn* lawn[15];
 Player* player1;
 /***********************************************/
 
@@ -47,7 +48,7 @@ void ProcessInput(SDL_Event* keyEvent);
 
 int sys_init(void)
 {
-	std::cout << "SDL2 Weather System init!" << std::endl;
+	std::cout << "SDL2 TinyXiuXian init!" << std::endl;
 	if (SDL_Init(SDL_VIDEO_OPENGL | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0) {
 		std::cout << "Failed to initialize SDL2!" << std::endl;
 		return -1;
@@ -59,7 +60,7 @@ int sys_init(void)
 		printf("Warning: Linear texture filtering not enabled!");
 	}
 #endif
-	window = SDL_CreateWindow("XiuXian", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GAME_WIDTH, GAME_HEIGHT, 0);
+	window = SDL_CreateWindow("TinyXiuXian", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GAME_WIDTH, GAME_HEIGHT, 0);
 
 	if (window == NULL) {
 		quitGame = true;
@@ -154,6 +155,8 @@ void Draw(void)
 {
 	SDL_GL_MakeCurrent(window, glContext);
 
+	SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255);
+
 	bk->render();
 
 	/* lawn->render() */
@@ -161,8 +164,16 @@ void Draw(void)
 		targetRect1.x = i * 100 + g_offset_x;
 		if ((targetRect1.x > -100) && (targetRect1.x < GAME_WIDTH + 100)) {
 			targetRect1.y = 630;
+			lawn[i]->set_position(glm::vec2(targetRect1.x, targetRect1.y));
 			//player1.set_position(glm::vec2(targetRect7.x, targetRect7.y));
-			SDL_RenderCopy(g_renderer, lawn1->current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
+			SDL_RenderCopy(g_renderer, lawn[i]->current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
+
+			if (g_debug_collision) {
+				targetRect2 = targetRect1;
+				targetRect2.w = lawn[i]->get_aabb().bb.x - lawn[i]->get_aabb().aa.x;
+				targetRect2.h = lawn[i]->get_aabb().bb.y - lawn[i]->get_aabb().aa.y;
+				SDL_RenderDrawRect(g_renderer, &targetRect2);
+			}
 		}
 	}
 
@@ -171,6 +182,13 @@ void Draw(void)
 	targetRect7.x = pos.x;
 	targetRect7.y = GAME_HEIGHT - pos.y; //invert Y axis
 	SDL_RenderCopy(g_renderer, player1->current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
+
+	if (g_debug_collision) {
+		targetRect2 = targetRect7;
+		targetRect2.w = player1->get_aabb().bb.x - player1->get_aabb().aa.x;
+		targetRect2.h = player1->get_aabb().bb.y - player1->get_aabb().aa.y;
+		SDL_RenderDrawRect(g_renderer, &targetRect2);
+	}
 
 	SDL_GL_SwapWindow(window);
 }
@@ -186,14 +204,9 @@ int main(int argc, char* argv[])
 
 	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
-	bk = new Background();
-	lawn1 = new Lawn();
-	player1 = new Player();
-	/* Init Actors resource */
-	lawn1->states.push_back(new ActorState("spring","res/images/lawn.png",
-																COLLISION_LEVEL_NULL));
-	lawn1->set_current_state("spring");
-
+	//Note the actor uid
+	bk = new Background();//uid = 1
+	player1 = new Player(); //uid = 2
 	player1->states.push_back(new ActorState("walk right","res/images/amy/wright_0.png",
 																 "res/images/amy/wright_1.png",
 																 "res/images/amy/wright_2.png",
@@ -210,12 +223,22 @@ int main(int argc, char* argv[])
 																COLLISION_LEVEL_NULL));
 	player1->set_current_state("idle right");
 
+	for (int i= 0; i < 15; i++) {
+		lawn[i] = new Lawn();
+		/* Init Actors resource */
+		lawn[i]->states.push_back(new ActorState("spring", "res/images/lawn.png",
+																COLLISION_LEVEL_NULL));
+		lawn[i]->set_current_state("spring");
+	}
+
 	//Make a target texture to render too
 	//SDL_Texture* texTarget = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, GAME_WIDTH, GAME_HEIGHT);
 
 	event_manager = EventManager::get_instance();
 	event_manager->register_event_type(bk, "background");
-	event_manager->register_event_type(lawn1, "lawn1");
+	for (int i = 0; i < 15; i++) {
+		event_manager->register_event_type(lawn[i], "lawn"+i);
+	}
 	event_manager->register_event_type(player1, "player1");
 
 	int done = 0;
@@ -236,6 +259,12 @@ int main(int argc, char* argv[])
 
 	PhysicsEngine physicsEngine;
 	physicsEngine.list.push_back(player1);
+
+	GameWorld* gGame = GameWorld::Get_Instance();
+	gGame->visible_list.push_back(player1);
+	for (int i = 0; i < 15; i++) {
+		gGame->visible_list.push_back(lawn[i]);
+	}
 
 	while (!quitGame) {
 		frameTime = SDL_GetTicks();
@@ -283,7 +312,7 @@ void ProcessInput(SDL_Event* keyEvent)
 	}
 
 	ActorEvent e;
-	e.uid = 3;//player1
+	e.uid = 2;//player1
 	if (keyEvent->type == SDL_KEYUP) {
 		if (keyEvent->key.keysym.sym == SDLK_ESCAPE) {
 			quitGame = true;
@@ -306,6 +335,9 @@ void ProcessInput(SDL_Event* keyEvent)
 				event_manager->dispatch_event(e);
 			}
 			if (keyEvent->key.keysym.sym == SDLK_s) {
+			}
+			if (keyEvent->key.keysym.sym == SDLK_t) {
+				g_debug_collision = !g_debug_collision;
 			}
 		}else if(keyEvent->key.keysym.mod == (KMOD_NUM | KMOD_LSHIFT)){
 			if (keyEvent->key.keysym.sym == SDLK_d) {

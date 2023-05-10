@@ -35,14 +35,27 @@ typedef enum {
 	KEY_RUN_JUMP,
 	KEY_FLY,
 	KEY_ATTACK,
-	KEY_BACKGROUND_MOVE
+	KEY_BACKGROUND_MOVE,
+	KEY_DESTROY,
+	KEY_AUDIO_METAL,
 }KeyEvent;
+
+typedef enum {
+	METALLIC,
+	WOOD,
+	BRICK
+}MATERIAL;
 
 typedef struct {
 	Uint32 uid;
 	KeyEvent event;
 	glm::vec2 speed;
 }ActorEvent;
+
+typedef struct {
+	glm::vec2 aa;
+	glm::vec2 bb;
+}AABB_BOX;
 
 /*
  * Global Actor Unique ID.
