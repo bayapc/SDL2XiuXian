@@ -9,6 +9,7 @@
 #include "Lawn.h"
 #include "PhysicsEngine.h"
 #include "EventManager.h"
+#include "Bullet.h"
 
 // screen
 int GAME_WIDTH = 1280;
@@ -18,7 +19,8 @@ int BACKGROUND_WIDTH = 1280;
 int BACKGROUND_HEIGHT = 720;
 
 int g_offset_x = 0;
-bool g_debug_collision = false;
+bool g_debug_collision = true;
+bool g_debug_reset = false;
 
 SDL_Window* window;
 SDL_Renderer* g_renderer;
@@ -42,6 +44,7 @@ EventManager* event_manager;
 Background* bk;
 Lawn* lawn[15];
 Player* player1;
+Bullet* bullet[2];
 /***********************************************/
 
 void ProcessInput(SDL_Event* keyEvent);
@@ -176,6 +179,26 @@ void Draw(void)
 			}
 		}
 	}
+	/* bullet->render() */
+	for (int i = 0; i < 2; i++) {
+		if (g_debug_reset) {
+			glm::vec2 pos = bullet[i]->get_position();
+			pos.y = 550;
+			bullet[i]->set_position(pos);
+			bullet[i]->set_speed(glm::vec2(0,0));
+		}
+		glm::vec2 pos = bullet[i]->get_position();
+		targetRect3.x = pos.x;
+		targetRect3.y = GAME_HEIGHT - pos.y; //invert Y axis
+		SDL_RenderCopy(g_renderer, bullet[i]->current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
+
+		if (g_debug_collision) {
+			targetRect2 = targetRect3;
+			targetRect2.w = bullet[i]->get_aabb().bb.x - bullet[i]->get_aabb().aa.x;
+			targetRect2.h = bullet[i]->get_aabb().bb.y - bullet[i]->get_aabb().aa.y;
+			SDL_RenderDrawRect(g_renderer, &targetRect2);
+		}
+	}
 
 	/* player1->render() */
 	glm::vec2 pos = player1->get_position();
@@ -189,6 +212,7 @@ void Draw(void)
 		targetRect2.h = player1->get_aabb().bb.y - player1->get_aabb().aa.y;
 		SDL_RenderDrawRect(g_renderer, &targetRect2);
 	}
+	g_debug_reset = false;
 
 	SDL_GL_SwapWindow(window);
 }
@@ -229,17 +253,35 @@ int main(int argc, char* argv[])
 		lawn[i]->states.push_back(new ActorState("spring", "res/images/lawn.png",
 																COLLISION_LEVEL_NULL));
 		lawn[i]->set_current_state("spring");
+
 	}
 
+	for (int i = 0; i < 2; i++) {
+		bullet[i] = new Bullet();
+		bullet[i]->set_position(glm::vec2(100+i*200,550));
+
+		bullet[i]->states.push_back(new ActorState("start", "res/images/Bullet/bullet_0.png",
+																COLLISION_LEVEL_NULL));
+		bullet[i]->states.push_back(new ActorState("normal", "res/images/Bullet/bullet_1.png",
+																COLLISION_LEVEL_NULL));
+		bullet[i]->states.push_back(new ActorState("explosion", "res/images/Bullet/bullet_2.png",
+																COLLISION_LEVEL_NULL));
+		bullet[i]->states.push_back(new ActorState("final", "res/images/Bullet/bullet_3.png",
+																COLLISION_LEVEL_NULL));
+		bullet[i]->set_current_state("start");
+	}
 	//Make a target texture to render too
 	//SDL_Texture* texTarget = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, GAME_WIDTH, GAME_HEIGHT);
 
 	event_manager = EventManager::get_instance();
 	event_manager->register_event_type(bk, "background");
 	for (int i = 0; i < 15; i++) {
-		event_manager->register_event_type(lawn[i], "lawn"+i);
+		event_manager->register_event_type(lawn[i], "lawn_"+i);
 	}
 	event_manager->register_event_type(player1, "player1");
+	for (int i = 0; i < 2; i++) {
+		event_manager->register_event_type(bullet[i], "bullet_"+i);
+	}
 
 	int done = 0;
 	int useShader = 0;
@@ -250,7 +292,7 @@ int main(int argc, char* argv[])
 
 	targetRect1.x = 0; targetRect1.y = 0; targetRect1.w = 100; targetRect1.h = 100;
 	targetRect2.x = 500; targetRect2.y = 420; targetRect2.w = 160; targetRect2.h = 240;
-	targetRect3.x = 750; targetRect3.y = 420; targetRect3.w = 160; targetRect3.h = 240;
+	targetRect3.x = 750; targetRect3.y = 420; targetRect3.w = 50; targetRect3.h = 50;
 	targetRect4.x = 800; targetRect4.y = 420; targetRect4.w = 160; targetRect4.h = 240;
 	targetRect5.x = 960; targetRect5.y = 420; targetRect5.w = 160; targetRect5.h = 240;
 	targetRect6.x = 1000; targetRect6.y = 500; targetRect6.w = 112; targetRect6.h = 168;
@@ -259,11 +301,17 @@ int main(int argc, char* argv[])
 
 	PhysicsEngine physicsEngine;
 	physicsEngine.list.push_back(player1);
+	for (int i = 0; i < 2; i++) {
+		physicsEngine.list.push_back(bullet[i]);
+	}
 
 	GameWorld* gGame = GameWorld::Get_Instance();
 	gGame->visible_list.push_back(player1);
 	for (int i = 0; i < 15; i++) {
 		gGame->visible_list.push_back(lawn[i]);
+	}
+	for (int i = 0; i < 2; i++) {
+		gGame->visible_list.push_back(bullet[i]);
 	}
 
 	while (!quitGame) {
@@ -338,6 +386,9 @@ void ProcessInput(SDL_Event* keyEvent)
 			}
 			if (keyEvent->key.keysym.sym == SDLK_t) {
 				g_debug_collision = !g_debug_collision;
+			}
+			if (keyEvent->key.keysym.sym == SDLK_r) {
+				g_debug_reset = true;
 			}
 		}else if(keyEvent->key.keysym.mod == (KMOD_NUM | KMOD_LSHIFT)){
 			if (keyEvent->key.keysym.sym == SDLK_d) {

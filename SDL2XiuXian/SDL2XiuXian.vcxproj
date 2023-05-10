@@ -150,6 +150,7 @@
     <ClCompile Include="ActorState.cpp" />
     <ClCompile Include="ActorTexture.cpp" />
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="GameWorld.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="ActorState.h" />
     <ClInclude Include="ActorTexture.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EventManager.h" />
     <ClInclude Include="GameWorld.h" />
