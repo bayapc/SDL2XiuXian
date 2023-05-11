@@ -50,9 +50,11 @@ void PhysicsEngine::do_collision(Actor* a)
 			e.uid = a->get_uid();
 			e.event = KEY_DESTROY;
 			em->dispatch_event(e);
+			std::cout << "a co_id:" << e.uid << std::endl;
 			if ((*i)->get_lifetime() > 0) {
 				e.uid = (*i)->get_uid();
 				em->dispatch_event(e);
+				std::cout << "b co_id:" << e.uid << std::endl;
 			}
 			break;
 		}

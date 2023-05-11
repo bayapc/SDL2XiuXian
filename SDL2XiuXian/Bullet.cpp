@@ -20,6 +20,7 @@ void Bullet::update(void)
 {
 	glm::vec2 p = get_position();
 	glm::vec2 s = get_speed();
+	//std::cout << "bullet:s(" << s.y << ")"<< std::endl;
 
 	if (p.x < 0) {
 		p.x = 0;
@@ -30,9 +31,16 @@ void Bullet::update(void)
 		set_position(p);
 		set_speed(glm::vec2(-s.x,s.y));
 	}
-	if (p.y <= 220) {//low limit Stop
-		p.y = 220;
-		set_speed(glm::vec2(s.x,100));
+	if (p.y < 100) {//low limit Stop
+		p.y = 100;
+		//set_speed(glm::vec2(s.x,100));
+		if (abs(s.y) < 10) {
+			s.y = 0;
+		}
+		if (abs(s.x) < 1) {
+			s.x = 0;
+		}
+		set_speed(glm::vec2(s.x,-s.y*0.8));
 		set_position(p);
 	}else if (p.y > GameWorld::screen_height) {
 		p.y = GameWorld::screen_height;
@@ -42,12 +50,15 @@ void Bullet::update(void)
 
 	ActorEvent ae = EventManager::get_instance()->get_event(this);
 	if (ae.uid != 0) {
+		std::cout << "Bullet(" << ae.uid << "):Collision Event" << std::endl;
 		/* const speed in x axis direction*/
 		set_acceleration(1);
 		if (ae.event == KEY_DESTROY) {
 			std::cout << "Bullet(" <<ae.uid<<"):Collision Event" << std::endl;
 			if (get_current_state() != "final") {
 				set_current_state("final");
+			}else {
+				set_current_state("normal");
 			}
 			set_speed(glm::vec2(0,0));
 		}

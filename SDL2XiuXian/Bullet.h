@@ -12,6 +12,9 @@ public:
     {
         set_position(glm::vec2(350, 550));
         set_speed(glm::vec2(0,0));
+        /* width and height should automatically loading from current picture*/
+        width = 32;
+        height = 32;
     };
     ~Bullet() {};
 

@@ -41,6 +41,7 @@ void Player::update(void)
 			e.event = KEY_BACKGROUND_MOVE;
 			e.speed = get_speed();
 			em->dispatch_event(e);
+			std::cout << "Player:Send Event to background" << std::endl;
 		}
 	}
 
@@ -92,6 +93,7 @@ void Player::update(void)
 	}else {
 		glm::vec2 speed = get_speed();
 		if (speed.x == 0) {
+			set_acceleration(0);
 			if ((get_current_state() == "idle right") || (get_current_state() == "walk right")) {
 				set_current_state("idle right");
 			}
