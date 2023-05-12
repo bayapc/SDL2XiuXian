@@ -45,16 +45,33 @@ void PhysicsEngine::do_collision(Actor* a)
 		if (a->get_uid() == (*i)->get_uid()) {
 			continue;
 		}
+		if (a->get_collision_uid()) {
+			if (a->get_collision_uid() == (*i)->get_uid()) {
+				if (is_collision(a->get_aabb(), (*i)->get_aabb())) {
+				}else {
+					/* Clean collision flag,prepare for a new collision*/
+					a->set_collision_uid(0);
+					(*i)->set_collision_uid(0);
+				}
+				break;
+			}
+			continue;
+		}
+		if ((*i)->get_collision_uid()) {
+			continue;
+		}
 		if (is_collision(a->get_aabb(),(*i)->get_aabb())) {
 			ActorEvent e;
 			e.uid = a->get_uid();
 			e.event = KEY_DESTROY;
 			em->dispatch_event(e);
-			std::cout << "a co_id:" << e.uid << std::endl;
+			(*i)->set_collision_uid(e.uid);//ignore multi collision
+			//std::cout << "a co_id:" << e.uid <<"aa.y:"<<a->get_aabb().aa.y<<"bb.y"<< a->get_aabb().bb.y<<"pos("<<a->get_position().x<<"," << a->get_position().y<< std::endl;
 			if ((*i)->get_lifetime() > 0) {
 				e.uid = (*i)->get_uid();
 				em->dispatch_event(e);
-				std::cout << "b co_id:" << e.uid << std::endl;
+				a->set_collision_uid(e.uid);//ignore multi collision
+				//std::cout << "b co_id:" << e.uid << "aa.y:" << (*i)->get_aabb().aa.y << "bb.y" << (*i)->get_aabb().bb.y << "pos(" << (*i)->get_position().x << "," << (*i)->get_position().y << std::endl;
 			}
 			break;
 		}

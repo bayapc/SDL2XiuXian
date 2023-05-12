@@ -11,7 +11,7 @@
 #include "EventManager.h"
 #include "Bullet.h"
 
-#define BULLET_NUM    5
+#define BULLET_NUM    100
 // screen
 int GAME_WIDTH = 1280;
 int GAME_HEIGHT = 720;
@@ -190,15 +190,15 @@ void Draw(void)
 	for (int i = 0; i < BULLET_NUM; i++) {
 		if (g_debug_reset) {
 			glm::vec2 pos = bullet[i]->get_position();
-			pos.y = 550;
+			pos.y = 550+i*10;
 			bullet[i]->set_position(pos);
-			bullet[i]->set_speed(glm::vec2(0,0));
+			bullet[i]->set_speed(glm::vec2(100,0));
 		}
 		glm::vec2 pos = bullet[i]->get_position();
 		targetRect3.x = pos.x - g_map_offset_x; //a global position
 		if ((targetRect3.x > 0) && (targetRect3.x < GAME_WIDTH)) {
 			/* show on the screen */
-			targetRect3.y = GAME_HEIGHT - pos.y; //invert Y axis
+			targetRect3.y = GAME_HEIGHT - pos.y - bullet[i]->height; //invert Y axis
 			targetRect3.w = bullet[i]->width;
 			targetRect3.h = bullet[i]->height;
 			SDL_RenderCopy(g_renderer, bullet[i]->current_state->get_current_picture()->get_texture(), NULL, &targetRect3);
@@ -215,7 +215,10 @@ void Draw(void)
 	/* player1->render() */
 	glm::vec2 pos = player1->get_position();
 	targetRect7.x = pos.x;
-	targetRect7.y = GAME_HEIGHT - pos.y; //invert Y axis
+	targetRect7.y = GAME_HEIGHT - pos.y - player1->height; //invert Y axis
+	//targetRect7.y = pos.y; //invert Y axis
+	targetRect7.w = player1->width;
+	targetRect7.h = player1->height;
 	SDL_RenderCopy(g_renderer, player1->current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
 
 	if (g_debug_collision) {
@@ -270,7 +273,7 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < BULLET_NUM; i++) {
 		bullet[i] = new Bullet();
-		bullet[i]->set_position(glm::vec2(100+i*200,550));
+		bullet[i]->set_position(glm::vec2(10+i*40,550+i*10));
 
 		bullet[i]->states.push_back(new ActorState("start", "res/images/Bullet/bullet_0.png",
 																COLLISION_LEVEL_NULL));

@@ -34,7 +34,7 @@ void EventManager::dispatch_event(ActorEvent event)
 	for (auto it = actor_map.begin(); it != actor_map.end(); it++) {
 		if (it->first == event.uid) {
 			it->second = event;
-			std::cout << "dispatch" << event.uid<<"ok"<< std::endl;
+			//std::cout << "dispatch" << event.uid<<"ok"<< std::endl;
 			break;
 		}
 	}
@@ -47,7 +47,7 @@ ActorEvent EventManager::get_event(Actor* a)
 		if (it->first == a->get_uid()) {
 			if (it->second.uid != 0) {
 				tmp = it->second;
-				std::cout << "get event" << a->get_uid() << "ok" << std::endl;
+				//std::cout << "get event" << a->get_uid() << "ok" << std::endl;
 				/* clean event*/
 				it->second = empty;
 				return tmp;

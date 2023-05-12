@@ -7,7 +7,7 @@ class Actor
 {
 public:
 	Actor() :
-		position(0,0), speed(0,0), acceleration(0), lifetime(100),width(100),height(100)
+		position(0,0), speed(0,0), acceleration(0), lifetime(100),width(100),height(100),collision_uid(0)
 	{
 		uid = alloc_actor_uid();
 	}
@@ -18,6 +18,8 @@ public:
 	int height;
 
 	Uint32 get_uid(void)			const   { return uid; }
+	Uint32 get_collision_uid(void)	const   { return collision_uid; }
+	void set_collision_uid(Uint32 id)		{ collision_uid = id; }
 	void set_position(glm::vec2 p) {
 		position = p;
 		aabb.aa = p;
@@ -46,6 +48,7 @@ private:
     std::deque<Trail> trails;
 
 	Uint32 uid;
+	Uint32 collision_uid;
 	glm::vec2 position;
 	glm::vec2 speed;
 	int acceleration;

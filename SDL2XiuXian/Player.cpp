@@ -6,6 +6,9 @@ void Player::set_current_state(std::string name)
 	{
 		if ((*it)->get_name() == name) {
 			current_state = (*it);
+			SDL_QueryTexture(current_state->get_current_picture()->get_texture(),NULL,NULL,&width,&height);
+			width = width * 3;
+			height = height * 3;
 		}
 	}
 }
@@ -26,8 +29,8 @@ void Player::update(void)
 		p.x = GameWorld::screen_width -100;
 		set_position(p);
 	}
-	if (p.y <= 220) {//low limit Stop
-		p.y = 220;
+	if (p.y < 60) {//low limit Stop
+		p.y = 60;
 		set_speed(glm::vec2(get_speed().x, 0));
 		set_position(p);
 	}
