@@ -24,13 +24,11 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 	/* acceleration feature */
 	if (a->get_acceleration() == 0) {
 		/* from other state to idle,start decrease speed.x */
-		if (speed.x > 0.2) {
+		if (speed.x > 1) {
 			speed.x = speed.x - t;
-		}
-		else if (speed.x < -0.2) {
+		}else if (speed.x < -1) {
 			speed.x = speed.x + t;
-		}
-		else {
+		}else {
 			speed.x = 0;
 		}
 	}

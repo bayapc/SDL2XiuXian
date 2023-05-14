@@ -246,19 +246,27 @@ int main(int argc, char* argv[])
 	//Note the actor uid
 	bk = new Background();//uid = 1
 	player1 = new Player(); //uid = 2
-	player1->states.push_back(new ActorState("walk right","res/images/amy/wright_0.png",
-																 "res/images/amy/wright_1.png",
-																 "res/images/amy/wright_2.png",
-																 "res/images/amy/wright_3.png",
+	player1->states.push_back(new ActorState("walk right","res/images/xiami/walk_right_0.png",
+																 "res/images/xiami/walk_right_1.png",
+																 "res/images/xiami/walk_right_2.png",
+																 "res/images/xiami/walk_right_3.png",
 																COLLISION_LEVEL_NULL));
-	player1->states.push_back(new ActorState("idle right","res/images/amy/wright_0.png",
+	player1->states.push_back(new ActorState("idle right","res/images/xiami/walk_right_0.png",
 																COLLISION_LEVEL_NULL));
-	player1->states.push_back(new ActorState("walk left","res/images/amy/wleft_0.png",
-																 "res/images/amy/wleft_1.png",
-																 "res/images/amy/wleft_2.png",
-																 "res/images/amy/wleft_3.png",
+	player1->states.push_back(new ActorState("jump right","res/images/xiami/jump_right_0.png",
 																COLLISION_LEVEL_NULL));
-	player1->states.push_back(new ActorState("idle left","res/images/amy/wleft_0.png",
+	player1->states.push_back(new ActorState("fly right","res/images/xiami/fly_right_0.png",
+																COLLISION_LEVEL_NULL));
+	player1->states.push_back(new ActorState("walk left","res/images/xiami/walk_left_0.png",
+																 "res/images/xiami/walk_left_1.png",
+																 "res/images/xiami/walk_left_2.png",
+																 "res/images/xiami/walk_left_3.png",
+																COLLISION_LEVEL_NULL));
+	player1->states.push_back(new ActorState("idle left","res/images/xiami/walk_left_0.png",
+																COLLISION_LEVEL_NULL));
+	player1->states.push_back(new ActorState("jump left","res/images/xiami/jump_left_0.png",
+																COLLISION_LEVEL_NULL));
+	player1->states.push_back(new ActorState("fly left","res/images/xiami/fly_left_0.png",
 																COLLISION_LEVEL_NULL));
 	player1->set_current_state("idle right");
 

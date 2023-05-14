@@ -7,8 +7,8 @@ void Player::set_current_state(std::string name)
 		if ((*it)->get_name() == name) {
 			current_state = (*it);
 			SDL_QueryTexture(current_state->get_current_picture()->get_texture(),NULL,NULL,&width,&height);
-			width = width * 3;
-			height = height * 3;
+			width = width;
+			height = height;
 		}
 	}
 }
@@ -34,6 +34,22 @@ void Player::update(void)
 		p.y = 60;
 		set_speed(glm::vec2(get_speed().x, 0));
 		set_position(p);
+	}else if (p.y > 200) {
+		if (get_current_state() == "jump left") {
+			set_current_state("fly left");
+			set_speed(glm::vec2(-30, get_speed().y));
+		}
+		if (get_current_state() == "jump right") {
+			set_current_state("fly right");
+			set_speed(glm::vec2(30, get_speed().y));
+		}
+	}else if (p.y < 200) {
+		if (get_current_state() == "fly left") {
+			set_current_state("jump left");
+		}
+		if (get_current_state() == "fly right") {
+			set_current_state("jump right");
+		}
 	}
 
 	if (get_acceleration()) {
@@ -59,46 +75,59 @@ void Player::update(void)
 		}
 
 		if (ae.event == KEY_WALK_RIGHT) {
-			if (get_current_state() != "walk right") {
+			if (((get_current_state() != "fly left")&&(get_current_state() != "fly right"))&&(get_current_state() != "walk right")) {
 				set_current_state("walk right");
 			}
 			set_speed(glm::vec2(20,get_speed().y));
 		}else if (ae.event == KEY_RUN_RIGHT) {
-			if (get_current_state() != "walk right") {
+			if (((get_current_state() != "fly left")&&(get_current_state() != "fly right"))&&(get_current_state() != "walk right")) {
 				set_current_state("walk right");
 			}
 			set_speed(glm::vec2(40,get_speed().y));
 		}else if (ae.event == KEY_WALK_LEFT) {
-			if (get_current_state() != "walk left") {
+			if (((get_current_state() != "fly left")&&(get_current_state() != "fly right"))&&(get_current_state() != "walk left")) {
 				set_current_state("walk left");
 			}
 			set_speed(glm::vec2(-20,get_speed().y));
 		}else if (ae.event == KEY_RUN_LEFT) {
-			if (get_current_state() != "walk left") {
+			if (((get_current_state() != "fly left")&&(get_current_state() != "fly right"))&&(get_current_state() != "walk left")) {
 				set_current_state("walk left");
 			}
 			set_speed(glm::vec2(-40,get_speed().y));
 		}else {
 			if (ae.event == KEY_JUMP) {
 				set_speed(glm::vec2(get_speed().x, 50));
+				if (((get_current_state() != "fly left") && (get_current_state() != "fly right"))) {
+					if ((get_current_state() == "idle left") || (get_current_state() == "walk left")) {
+						set_current_state("jump left");
+					}
+					else {
+						set_current_state("jump right");
+					}
+				}
 			}else if (ae.event == KEY_RUN_JUMP) {
 				set_speed(glm::vec2(get_speed().x, 100));
+				if (((get_current_state() != "fly left") && (get_current_state() != "fly right"))) {
+					if ((get_current_state() == "idle left") || (get_current_state() == "walk left")) {
+						set_current_state("jump left");
+					}
+					else {
+						set_current_state("jump right");
+					}
+				}
 			}else if (ae.event == KEY_STOP) {
-				/* decrease speed in x axis direction*/
-				set_acceleration(0);
-				set_speed(glm::vec2(0, 0));
-			}
-			/* jump state need to be update*/
-			if ((get_current_state() == "idle right") || (get_current_state() == "walk right")) {
-				set_current_state("idle right");
-			}
-			else {
-				set_current_state("idle left");
+				if ((get_current_state() != "fly left")&&(get_current_state() != "fly right")) {
+					/* decrease speed in x axis direction*/
+					set_acceleration(0);
+					set_speed(glm::vec2(0, 0));
+					/* jump state need to be update*/
+					set_current_state("idle left");
+				}
 			}
 		}
 	}else {
 		glm::vec2 speed = get_speed();
-		if (speed.x == 0) {
+		if ((speed.x == 0)&&(speed.y == 0)) {
 			set_acceleration(0);
 			if ((get_current_state() == "idle right") || (get_current_state() == "walk right")) {
 				set_current_state("idle right");
