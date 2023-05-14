@@ -10,6 +10,7 @@ public:
 	static void Set_Renderer(SDL_Renderer* r) { gRenderer = r; }
 	static int screen_width;
 	static int screen_height;
+	static int map_offset_x;
 	static std::vector<Actor*> visible_list;
 	static std::vector<Actor*> total_list;
 private:

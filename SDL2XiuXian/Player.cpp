@@ -22,13 +22,14 @@ void Player::update(void)
 {
 	glm::vec2 p = get_position();
 
-	if (p.x < 0) {
-		p.x = 0;
+	if (p.x < (0+GameWorld::map_offset_x)) {
+		p.x = (0+GameWorld::map_offset_x);
 		set_position(p);
-	}else if (p.x > GameWorld::screen_width -100) {
-		p.x = GameWorld::screen_width -100;
+	}else if (p.x > (GameWorld::screen_width -100 + GameWorld::map_offset_x)) {
+		p.x = (GameWorld::screen_width -100 + GameWorld::map_offset_x);
 		set_position(p);
 	}
+
 	if (p.y < 60) {//low limit Stop
 		p.y = 60;
 		set_speed(glm::vec2(get_speed().x, 0));
@@ -37,15 +38,16 @@ void Player::update(void)
 
 	if (get_acceleration()) {
 		/* send move background event*/
-		if ((p.x < GameWorld::screen_width / 3) || (p.x > GameWorld::screen_height / 2)) {
+		//if ((p.x < (GameWorld::map_offset_x + GameWorld::screen_width / 3)) || (p.x > (GameWorld::map_offset_x + GameWorld::screen_height / 2))) {
 			EventManager* em = EventManager::get_instance();
 			ActorEvent e;
 			e.uid = em->get_uid_by_name("background");//background
 			e.event = KEY_BACKGROUND_MOVE;
 			e.speed = get_speed();
+			e.speed.x = e.speed.x / 2;
 			em->dispatch_event(e);
-			std::cout << "Player:Send Event to background" << std::endl;
-		}
+			//std::cout << "Player:Send Event to background" << std::endl;
+		//}
 	}
 
 	ActorEvent ae = EventManager::get_instance()->get_event(this);
@@ -60,22 +62,22 @@ void Player::update(void)
 			if (get_current_state() != "walk right") {
 				set_current_state("walk right");
 			}
-			set_speed(glm::vec2(10,get_speed().y));
+			set_speed(glm::vec2(20,get_speed().y));
 		}else if (ae.event == KEY_RUN_RIGHT) {
 			if (get_current_state() != "walk right") {
 				set_current_state("walk right");
 			}
-			set_speed(glm::vec2(25,get_speed().y));
+			set_speed(glm::vec2(40,get_speed().y));
 		}else if (ae.event == KEY_WALK_LEFT) {
 			if (get_current_state() != "walk left") {
 				set_current_state("walk left");
 			}
-			set_speed(glm::vec2(-10,get_speed().y));
+			set_speed(glm::vec2(-20,get_speed().y));
 		}else if (ae.event == KEY_RUN_LEFT) {
 			if (get_current_state() != "walk left") {
 				set_current_state("walk left");
 			}
-			set_speed(glm::vec2(-25,get_speed().y));
+			set_speed(glm::vec2(-40,get_speed().y));
 		}else {
 			if (ae.event == KEY_JUMP) {
 				set_speed(glm::vec2(get_speed().x, 50));
@@ -84,6 +86,7 @@ void Player::update(void)
 			}else if (ae.event == KEY_STOP) {
 				/* decrease speed in x axis direction*/
 				set_acceleration(0);
+				set_speed(glm::vec2(0, 0));
 			}
 			/* jump state need to be update*/
 			if ((get_current_state() == "idle right") || (get_current_state() == "walk right")) {

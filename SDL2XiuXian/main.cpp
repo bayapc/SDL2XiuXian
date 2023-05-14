@@ -11,6 +11,7 @@
 #include "EventManager.h"
 #include "Bullet.h"
 
+#define LAWN_NUM	  45  //lawn_100x100 --> background_3000x720
 #define BULLET_NUM    100
 // screen
 int GAME_WIDTH = 1280;
@@ -19,7 +20,7 @@ int GAME_HEIGHT = 720;
 int BACKGROUND_WIDTH = 1280;
 int BACKGROUND_HEIGHT = 720;
 
-int g_map_offset_x = 0;
+//int g_map_offset_x = 0;
 int g_offset_x = 0;
 bool g_debug_collision = true;
 bool g_debug_reset = false;
@@ -30,6 +31,7 @@ SDL_GLContext glContext;
 //GameWorld gGameWorld;
 bool quitGame = false;
 unsigned long MIN_FRAME_TIME = 17;
+
 SDL_Rect srcRect1;
 SDL_Rect targetRect1;
 SDL_Rect targetRect2;
@@ -44,7 +46,7 @@ ActorEvent actor_event = {0, KEY_IDLE,{0,0}};
 /********************Actors***************************/
 EventManager* event_manager;
 Background* bk;
-Lawn* lawn[15];
+Lawn* lawn[LAWN_NUM];
 Player* player1;
 Bullet* bullet[BULLET_NUM];
 /***********************************************/
@@ -144,16 +146,8 @@ void Update(void)
 	/* background */
 	bk->update();
 	/* lawn->update() */
-	//g_offset_x += (-actor_event.speed.x);
-	g_offset_x += (-player1->get_speed().x)*0.5;
-	if (g_offset_x > 0) {
-		g_offset_x = -98;
-	}
-	if (g_offset_x < -100) {
-		g_offset_x = -2;
-	}
-	g_map_offset_x +=(player1->get_speed().x)*0.5;
 
+	/* bullet */
 	for (int i = 0; i < BULLET_NUM; i++) {
 		bullet[i]->update();
 	}
@@ -170,12 +164,14 @@ void Draw(void)
 	bk->render();
 
 	/* lawn->render() */
-	for (int i = 0; i < 15; i++) {
-		targetRect1.x = i * 100 + g_offset_x;
-		if ((targetRect1.x > -100) && (targetRect1.x < GAME_WIDTH + 100)) {
-			targetRect1.y = 630;
-			lawn[i]->set_position(glm::vec2(targetRect1.x, targetRect1.y));
-			//player1.set_position(glm::vec2(targetRect7.x, targetRect7.y));
+	for (int i = 0; i < LAWN_NUM; i++) {
+		glm::vec2 pos = lawn[i]->get_position();
+		targetRect1.x = pos.x - GameWorld::map_offset_x; //Transform to screen offset
+		if ((targetRect1.x > -100) && (targetRect1.x < GAME_WIDTH)) {
+			//targetRect1.y = 630;
+			targetRect1.y = GAME_HEIGHT - pos.y - lawn[i]->height; //invert Y axis
+			targetRect1.w = lawn[i]->width;
+			targetRect1.h = lawn[i]->height;
 			SDL_RenderCopy(g_renderer, lawn[i]->current_state->get_current_picture()->get_texture(), NULL, &targetRect1);
 
 			if (g_debug_collision) {
@@ -186,16 +182,20 @@ void Draw(void)
 			}
 		}
 	}
+
 	/* bullet->render() */
 	for (int i = 0; i < BULLET_NUM; i++) {
 		if (g_debug_reset) {
 			glm::vec2 pos = bullet[i]->get_position();
-			pos.y = 550+i*10;
+			pos.y = 10+(i*35)%720;
 			bullet[i]->set_position(pos);
 			bullet[i]->set_speed(glm::vec2(100,0));
+			bullet[i]->set_lifetime(100);
+			bullet[i]->set_current_state("start");
 		}
 		glm::vec2 pos = bullet[i]->get_position();
-		targetRect3.x = pos.x - g_map_offset_x; //a global position
+		targetRect3.x = pos.x - GameWorld::map_offset_x; //Transform to screen offset
+		//if ((bullet[i]->get_lifetime() > 0)&&(targetRect3.x > 0) && (targetRect3.x < GAME_WIDTH)) {
 		if ((targetRect3.x > 0) && (targetRect3.x < GAME_WIDTH)) {
 			/* show on the screen */
 			targetRect3.y = GAME_HEIGHT - pos.y - bullet[i]->height; //invert Y axis
@@ -214,7 +214,7 @@ void Draw(void)
 
 	/* player1->render() */
 	glm::vec2 pos = player1->get_position();
-	targetRect7.x = pos.x;
+	targetRect7.x = pos.x - GameWorld::map_offset_x; //Transform to screen offset
 	targetRect7.y = GAME_HEIGHT - pos.y - player1->height; //invert Y axis
 	//targetRect7.y = pos.y; //invert Y axis
 	targetRect7.w = player1->width;
@@ -262,10 +262,11 @@ int main(int argc, char* argv[])
 																COLLISION_LEVEL_NULL));
 	player1->set_current_state("idle right");
 
-	for (int i= 0; i < 15; i++) {
+	for (int i= 0; i < LAWN_NUM; i++) {
 		lawn[i] = new Lawn();
+		lawn[i]->set_position(glm::vec2(i*100,0));
 		/* Init Actors resource */
-		lawn[i]->states.push_back(new ActorState("spring", "res/images/lawn.png",
+		lawn[i]->states.push_back(new ActorState("spring", "res/images/lawn_100x100.png",
 																COLLISION_LEVEL_NULL));
 		lawn[i]->set_current_state("spring");
 
@@ -273,7 +274,7 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < BULLET_NUM; i++) {
 		bullet[i] = new Bullet();
-		bullet[i]->set_position(glm::vec2(10+i*40,550+i*10));
+		bullet[i]->set_position(glm::vec2(10+(i/10)*50+i*3,10+(i*35)%720));
 
 		bullet[i]->states.push_back(new ActorState("start", "res/images/Bullet/bullet_0.png",
 																COLLISION_LEVEL_NULL));
@@ -290,7 +291,7 @@ int main(int argc, char* argv[])
 
 	event_manager = EventManager::get_instance();
 	event_manager->register_event_type(bk, "background");
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < LAWN_NUM; i++) {
 		event_manager->register_event_type(lawn[i], "lawn_"+i);
 	}
 	event_manager->register_event_type(player1, "player1");

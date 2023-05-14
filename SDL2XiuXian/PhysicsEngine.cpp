@@ -9,6 +9,19 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 	pos.y = pos.y + speed.y * t - 0.5 * 9.8 * t * t;//invert y coordinate
 	a->set_position(pos);
 
+	if (a->get_uid() == 2) {
+		/* update map global x offset */
+		GameWorld::map_offset_x += speed.x * t * 0.5;
+		if (GameWorld::map_offset_x > 3000) {
+			GameWorld::map_offset_x = 3000;
+		}
+		if (GameWorld::map_offset_x < 0) {
+			GameWorld::map_offset_x = 0;
+		}
+	}
+
+#if true
+	/* acceleration feature */
 	if (a->get_acceleration() == 0) {
 		/* from other state to idle,start decrease speed.x */
 		if (speed.x > 0.2) {
@@ -21,6 +34,7 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 			speed.x = 0;
 		}
 	}
+#endif
 	speed.y = speed.y - 9.8 * t;
 	a->set_speed(speed);
 	//if (speed.y != 0) {
@@ -55,6 +69,9 @@ void PhysicsEngine::do_collision(Actor* a)
 				}
 				break;
 			}
+			continue;
+		}
+		if ((*i)->get_lifetime() == 0) {
 			continue;
 		}
 		if ((*i)->get_collision_uid()) {
@@ -94,6 +111,9 @@ void PhysicsEngine::engine_thread(void)
 				continue;
 			}
 			for (auto i = list.begin(); i != list.end(); i++) {
+				if ((*i)->get_lifetime() == 0) {
+					continue;
+				}
 				calculate_position(*i,interval*0.01);
 				do_collision(*i);
 			}

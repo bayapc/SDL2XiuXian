@@ -8,7 +8,7 @@ class Lawn :
 {
 public:
     Lawn() {
-        set_position(glm::vec2(0,550));
+        set_position(glm::vec2(0,630));
     }
     ~Lawn() {};
     void set_current_state(std::string name);

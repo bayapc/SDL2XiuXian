@@ -22,12 +22,12 @@ void Bullet::update(void)
 	glm::vec2 s = get_speed();
 	//std::cout << "bullet:s(" << s.y << ")"<< std::endl;
 
-	if (p.x < 0) {
-		p.x = 0;
+	if (p.x < (0+GameWorld::map_offset_x)) {
+		p.x = (0+GameWorld::map_offset_x);
 		set_speed(glm::vec2(-s.x,s.y));
 		set_position(p);
-	}else if (p.x > GameWorld::screen_width -100) {
-		p.x = GameWorld::screen_width -100;
+	}else if (p.x > (GameWorld::screen_width + GameWorld::map_offset_x)) {
+		p.x = (GameWorld::screen_width + GameWorld::map_offset_x);
 		set_position(p);
 		set_speed(glm::vec2(-s.x,s.y));
 	}
@@ -40,7 +40,7 @@ void Bullet::update(void)
 		if (abs(s.x) < 1) {
 			s.x = 0;
 		}
-		set_speed(glm::vec2(s.x,-s.y*0.9));
+		set_speed(glm::vec2(s.x,-s.y*0.8));
 		set_position(p);
 	}else if (p.y > GameWorld::screen_height) {
 		p.y = GameWorld::screen_height;
@@ -55,12 +55,23 @@ void Bullet::update(void)
 		//set_acceleration(1);
 		if (ae.event == KEY_DESTROY) {
 			//std::cout << "Bullet(" <<ae.uid<<"):Collision Event" << std::endl;
-			if (get_current_state() != "final") {
-				set_current_state("final");
-			}else {
+			set_current_state("final");
+			set_lifetime(0);
+#if false
+			int life = get_lifetime();
+			set_lifetime(life - 100);
+			if (life > 10) {
 				set_current_state("normal");
+			}else {
+				if (life < 0) {
+					set_current_state("final");
+					set_lifetime(0);
+				}else {
+					set_current_state("explosion");
+				}
 			}
-			set_speed(glm::vec2(s.x, -s.y * 0.9));
+#endif
+			set_speed(glm::vec2(s.x, -s.y * 0.8));
 			set_position(p);
 		}
 	}
