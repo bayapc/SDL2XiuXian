@@ -18,8 +18,10 @@ public:
 	int height;
 
 	Uint32 get_uid(void)			const   { return uid; }
-	Uint32 get_collision_uid(void)	const   { return collision_uid; }
-	void set_collision_uid(Uint32 id)		{ collision_uid = id; }
+	Uint32 get_collision_uid(void)	const   { return collision_uid.load(); }
+	void set_collision_uid(Uint32 id)		{ collision_uid.store(id); }
+	Uint32 get_fly_status(void)	const		{ return fly.load(); }
+	void set_fly_status(Uint32 f)			{ fly.store(f); }
 	void set_position(glm::vec2 p) {
 		position = p;
 		aabb.aa = p;
@@ -29,10 +31,10 @@ public:
 	glm::vec2 get_position()		const	{ return position;}
 	void set_speed(glm::vec2 s)					{ speed = s;}
 	glm::vec2 get_speed(void)		const	{ return speed;}
-	void set_acceleration(int acc)			{ acceleration = acc;}
-	int get_acceleration(void)		const	{ return acceleration;}
-	void set_lifetime(int life)				{ lifetime = life;}
-	int get_lifetime(void)			const	{ return lifetime;}
+	void set_acceleration(int acc)			{ acceleration.store(acc);}
+	int get_acceleration(void)		const	{ return acceleration.load();}
+	void set_lifetime(int life)				{ lifetime.store(life);}
+	int get_lifetime(void)			const	{ return lifetime.load();}
 	void update(void);
 	void scroll_back(void);
 	AABB_BOX get_aabb()				const   { return aabb;}
@@ -48,12 +50,14 @@ private:
     std::deque<Trail> trails;
 
 	Uint32 uid;
-	Uint32 collision_uid;
+	MATERIAL material;
 	glm::vec2 position;
 	glm::vec2 speed;
-	int acceleration;
-	int lifetime;
-	MATERIAL material;
 	AABB_BOX aabb;
+
+	std::atomic<Uint32> fly;
+	std::atomic<Uint32> collision_uid;
+	std::atomic<int> acceleration;
+	std::atomic<int> lifetime;
 };
 

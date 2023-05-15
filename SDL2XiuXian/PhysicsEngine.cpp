@@ -18,6 +18,8 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 		if (GameWorld::map_offset_x < 0) {
 			GameWorld::map_offset_x = 0;
 		}
+
+		//std::cout << "plyer: speed(" << speed.x << "," << speed.y <<")"<< std::endl;
 	}
 
 #if true
