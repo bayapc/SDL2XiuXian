@@ -52,16 +52,14 @@ void Player::update(void)
 
 	if (get_acceleration()) {
 		/* send move background event*/
-		//if ((p.x < (GameWorld::map_offset_x + GameWorld::screen_width / 3)) || (p.x > (GameWorld::map_offset_x + GameWorld::screen_height / 2))) {
-			EventManager* em = EventManager::get_instance();
-			ActorEvent e;
-			e.uid = em->get_uid_by_name("background");//background
-			e.event = KEY_BACKGROUND_MOVE;
-			e.speed = get_speed();
-			e.speed.x = e.speed.x / 2;
-			em->dispatch_event(e);
-			//std::cout << "Player:Send Event to background" << std::endl;
-		//}
+		EventManager* em = EventManager::get_instance();
+		ActorEvent e;
+		e.uid = em->get_uid_by_name("background");//background
+		e.event = KEY_BACKGROUND_MOVE;
+		e.speed = get_speed();
+		e.speed.x = e.speed.x / 5;
+		em->dispatch_event(e);
+		//std::cout << "Player:Send Event to background" << std::endl;
 	}
 
 	ActorEvent ae = EventManager::get_instance()->get_event(this);

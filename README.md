@@ -6,4 +6,19 @@ The game is about God story.
 
 ##Dependency
 
-SDL2 and OpenGL
+C++,SDL2 and OpenGL
+
+vs2019
+
+##Key Map
+W-->Jump
+A-->walk left
+D-->walk right
+WW-->fly
+T-->show debug collision box
+R-->Reset bullet
+
+#Copyright MIT License
+
+Author:bayapc
+Email:71171378@qq.com

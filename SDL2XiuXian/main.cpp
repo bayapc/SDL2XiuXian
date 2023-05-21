@@ -11,7 +11,7 @@
 #include "EventManager.h"
 #include "Bullet.h"
 
-#define LAWN_NUM	  45  //lawn_100x100 --> background_3000x720
+#define LAWN_NUM	  60  //lawn_100x100 --> background_3000x720
 #define BULLET_NUM    100
 // screen
 int GAME_WIDTH = 1280;
@@ -20,7 +20,6 @@ int GAME_HEIGHT = 720;
 int BACKGROUND_WIDTH = 1280;
 int BACKGROUND_HEIGHT = 720;
 
-//int g_map_offset_x = 0;
 int g_offset_x = 0;
 bool g_debug_collision = true;
 bool g_debug_reset = false;
@@ -55,19 +54,13 @@ void ProcessInput(SDL_Event* keyEvent);
 
 int sys_init(void)
 {
-	std::cout << "SDL2 TinyXiuXian init!" << std::endl;
+	std::cout << "SDL2 XiuXian init!" << std::endl;
 	if (SDL_Init(SDL_VIDEO_OPENGL | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0) {
 		std::cout << "Failed to initialize SDL2!" << std::endl;
 		return -1;
 	}
-#if false
-	//Set texture filtering to linear
-	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
-	{
-		printf("Warning: Linear texture filtering not enabled!");
-	}
-#endif
-	window = SDL_CreateWindow("TinyXiuXian", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GAME_WIDTH, GAME_HEIGHT, 0);
+
+	window = SDL_CreateWindow("XiuXian", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GAME_WIDTH, GAME_HEIGHT, 0);
 
 	if (window == NULL) {
 		quitGame = true;
@@ -77,7 +70,6 @@ int sys_init(void)
 
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 
-	//SDL_Renderer* g_renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	g_renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
 	glContext = SDL_GL_CreateContext(window);
@@ -109,31 +101,11 @@ int sys_init(void)
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetSwapInterval(1);
 
-	// Create a double-buffered draw context
-	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	//SDL_GL_SetSwapInterval(1);
 	glViewport(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-	// Set Mode to GL_PROJECTION
-		//
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-
-	// Set projection MATRIX to ORTHO
-	// I use a near plane value of -1, and a far plane value of 1, which is what works best for 2D games.
-	//glOrtho(0.0, GAME_WIDTH, 0.0, GAME_HEIGHT, -1.0, 1.0);
-
-	// Setting Mode to GL_MODELVIEW
-	//glMatrixMode(GL_MODELVIEW);
-
-	// -----------------------------
-	//glEnable(GL_DEPTH_TEST);
 
 	// ----- ICO
 	IMG_Init(IMG_INIT_PNG);
 	SDL_Surface* loadedSurface = IMG_Load("res/images/xiuxian.png");
-	//std::string fileName = "res/images/ico.bmp";
-	//SDL_Surface* loadedSurface = SDL_LoadBMP(fileName.c_str());
 	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 255, 0, 255));
 	SDL_SetWindowIcon(window, loadedSurface);
 	SDL_FreeSurface(loadedSurface);
@@ -168,7 +140,6 @@ void Draw(void)
 		glm::vec2 pos = lawn[i]->get_position();
 		targetRect1.x = pos.x - GameWorld::map_offset_x; //Transform to screen offset
 		if ((targetRect1.x > -100) && (targetRect1.x < GAME_WIDTH)) {
-			//targetRect1.y = 630;
 			targetRect1.y = GAME_HEIGHT - pos.y - lawn[i]->height; //invert Y axis
 			targetRect1.w = lawn[i]->width;
 			targetRect1.h = lawn[i]->height;
@@ -195,7 +166,6 @@ void Draw(void)
 		}
 		glm::vec2 pos = bullet[i]->get_position();
 		targetRect3.x = pos.x - GameWorld::map_offset_x; //Transform to screen offset
-		//if ((bullet[i]->get_lifetime() > 0)&&(targetRect3.x > 0) && (targetRect3.x < GAME_WIDTH)) {
 		if ((targetRect3.x > 0) && (targetRect3.x < GAME_WIDTH)) {
 			/* show on the screen */
 			targetRect3.y = GAME_HEIGHT - pos.y - bullet[i]->height; //invert Y axis
@@ -216,7 +186,6 @@ void Draw(void)
 	glm::vec2 pos = player1->get_position();
 	targetRect7.x = pos.x - GameWorld::map_offset_x; //Transform to screen offset
 	targetRect7.y = GAME_HEIGHT - pos.y - player1->height; //invert Y axis
-	//targetRect7.y = pos.y; //invert Y axis
 	targetRect7.w = player1->width;
 	targetRect7.h = player1->height;
 	SDL_RenderCopy(g_renderer, player1->current_state->get_current_picture()->get_texture(), NULL, &targetRect7);
@@ -282,7 +251,7 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < BULLET_NUM; i++) {
 		bullet[i] = new Bullet();
-		bullet[i]->set_position(glm::vec2(10+(i/10)*50+i*3,10+(i*35)%720));
+		bullet[i]->set_position(glm::vec2(rand()%GameWorld::screen_width,10+(i*35)%720));
 
 		bullet[i]->states.push_back(new ActorState("start", "res/images/Bullet/bullet_0.png",
 																COLLISION_LEVEL_NULL));
@@ -294,8 +263,6 @@ int main(int argc, char* argv[])
 																COLLISION_LEVEL_NULL));
 		bullet[i]->set_current_state("start");
 	}
-	//Make a target texture to render too
-	//SDL_Texture* texTarget = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, GAME_WIDTH, GAME_HEIGHT);
 
 	event_manager = EventManager::get_instance();
 	event_manager->register_event_type(bk, "background");
@@ -331,11 +298,7 @@ int main(int argc, char* argv[])
 
 	GameWorld* gGame = GameWorld::Get_Instance();
 	gGame->visible_list.push_back(player1);
-#if false
-	for (int i = 0; i < 15; i++) {
-		gGame->visible_list.push_back(lawn[i]);
-	}
-#endif
+
 	for (int i = 0; i < BULLET_NUM; i++) {
 		gGame->visible_list.push_back(bullet[i]);
 	}

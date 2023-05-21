@@ -30,7 +30,6 @@ void EventManager::deregister_event_type(Actor* a)
 }
 void EventManager::dispatch_event(ActorEvent event)
 {
-	//actor_map[event.uid] = event;
 	for (auto it = actor_map.begin(); it != actor_map.end(); it++) {
 		if (it->first == event.uid) {
 			it->second = event;

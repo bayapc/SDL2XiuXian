@@ -3,7 +3,6 @@
 void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 {
 	glm::vec2 speed = a->get_speed();
-	//std::cout << "PhyEngine:speed:(" << speed.x << "," << speed.y << ")" << std::endl;
 	glm::vec2 pos = a->get_position();
 	pos.x = pos.x + speed.x * t;
 	pos.y = pos.y + speed.y * t - 0.5 * 9.8 * t * t;//invert y coordinate
@@ -18,11 +17,8 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 		if (GameWorld::map_offset_x < 0) {
 			GameWorld::map_offset_x = 0;
 		}
-
-		//std::cout << "plyer: speed(" << speed.x << "," << speed.y <<")"<< std::endl;
 	}
 
-#if true
 	/* acceleration feature */
 	if (a->get_acceleration() == 0) {
 		/* from other state to idle,start decrease speed.x */
@@ -34,14 +30,9 @@ void PhysicsEngine::calculate_position(Actor* a,FLOAT t)
 			speed.x = 0;
 		}
 	}
-#endif
+
 	speed.y = speed.y - 9.8 * t;
 	a->set_speed(speed);
-	//if (speed.y != 0) {
-		//std::cout << "T:" << t << std::endl;
-		//std::cout << "PhyEngine:pos:(" << pos.x << "," << pos.y << ")" << std::endl;
-		//std::cout << "PhyEngine:pos:(" << pos.x << "," << pos.y << ") speed:(" << speed.x << "," << speed.y << ")" << std::endl;
-	//}
 }
 
 static bool is_collision(AABB_BOX first, AABB_BOX second)
